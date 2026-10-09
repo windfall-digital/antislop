@@ -1,11 +1,12 @@
 {
   "name": "@windfall-digital/antislop",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Opinionated Oxlint rules that reject low-evidence TypeScript and JavaScript patterns.",
   "type": "module",
   "exports": {
     ".": "./dist/src/index.js",
-    "./windfall": "./dist/windfall/index.js"
+    "./windfall": "./dist/windfall/index.js",
+    "./effect": "./dist/src/effect/index.js"
   },
   "files": [
     "dist"

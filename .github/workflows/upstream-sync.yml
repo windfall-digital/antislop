@@ -27,12 +27,17 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ github.token }}
+      # Optional repo secret: a fine-grained PAT (Contents, Pull requests,
+      # Issues, Workflows: read and write on this repo). With it, sync PRs
+      # trigger CI and merges that touch `.github/workflows/` can be pushed.
+      # Without it, the default GITHUB_TOKEN is used.
+      GH_TOKEN: ${{ secrets.UPSTREAM_SYNC_TOKEN || github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_SYNC_TOKEN || github.token }}
 
       - name: Fetch upstream
         id: fetch

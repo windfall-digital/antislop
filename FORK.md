@@ -7,8 +7,8 @@ A public fork of [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop) (MI
 - Based on upstream `main` at `c44ef22`, the same commit the template vendored, so `src/` is identical.
 - Remotes:
   - `upstream`: `dmmulroy/anti-slop`.
-  - `origin`: `windfall-digital/antislop`. This repo **does not exist on GitHub yet**; create it as a public fork (`gh repo fork dmmulroy/anti-slop --org windfall-digital --fork-name antislop`), then push.
-- Packaging, tests, workflows and docs (TODO 1–6) are done locally. Nothing is pushed or tagged.
+  - `origin`: `windfall-digital/antislop`, a public fork on GitHub.
+- `v0.2.0` is released. `0.3.0` adds the `./effect` export (plugin `anti-slop-effect`, upstream's opt-in Effect rules).
 
 ## Layout decision
 
@@ -36,14 +36,14 @@ Use a git tag, not npm, for now. The `windfall-digital` org doesn't exist on npm
 - **Windfall tests run in `posttest`.** Upstream's single-line `test` script stays byte-identical so that upstream adding a rule test doesn't conflict. pnpm runs `posttest` after `test` by default.
 - **`no-interpolated-class-name`** keeps its `classNames()` wording; it's our fork.
 - **Release** (`.github/workflows/release.yml`): a `v*` tag push checks that the tag equals `v` + `package.json` `version`, runs `pnpm check` (which builds), commits `dist/` on top of the tagged commit, force-moves the tag to that commit, and creates a GitHub Release. Re-runs skip the build if the tag already carries `dist/`. Tag rulesets that block force-pushes would break it.
-- **Upstream sync** (`.github/workflows/upstream-sync.yml`): daily at 05:17 UTC and on `workflow_dispatch`. A clean merge force-pushes `sync/upstream` (rebuilt from `main` each run) and opens or updates a PR; a conflict opens, or comments on, an issue titled "Upstream sync: merge conflict with dmmulroy/anti-slop". It never pushes to `main`. Known `GITHUB_TOKEN` limits: the PR it opens doesn't trigger CI (close and reopen it, or switch to an App/PAT token), and the push fails if upstream changes `.github/workflows/` (merge that one by hand).
+- **Upstream sync** (`.github/workflows/upstream-sync.yml`): daily at 05:17 UTC and on `workflow_dispatch`. A clean merge force-pushes `sync/upstream` (rebuilt from `main` each run) and opens or updates a PR; a conflict opens, or comments on, an issue titled "Upstream sync: merge conflict with dmmulroy/anti-slop". It never pushes to `main`. It uses the optional repo secret `UPSTREAM_SYNC_TOKEN`, a fine-grained PAT on this repo with read/write Contents, Pull requests, Issues and Workflows. Without it, the default `GITHUB_TOKEN` is used: the PR it opens doesn't trigger CI (close and reopen it), and the push fails if upstream changes `.github/workflows/` (merge that one by hand).
 
 ## Release procedure
 
 1. Bump `version` in `package.json` on `main`.
 2. Tag `vX.Y.Z` on that commit and push the tag; the release workflow does the rest.
 
-First release: `v0.2.0` (`package.json` is already at 0.2.0). Tag only after owner approval.
+Tag only after owner approval.
 
 ## After the first release, in windfall-template
 
