@@ -2,14 +2,13 @@
 
 A public fork of [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop) (MIT). It ships the upstream `anti-slop/*` rules unchanged, plus Windfall's own `windfall/*` rules. The consumer is `windfall-digital/windfall-template`. That repo currently vendors both plugins under `tools/oxlint/anti-slop/` and `tools/oxlint/windfall/`, and the fork will replace them.
 
-## State of this stub
+## State
 
-- The repo is cloned from upstream `main` at `c44ef22`, which is the same commit the template vendored, so `src/` is identical.
+- Based on upstream `main` at `c44ef22`, the same commit the template vendored, so `src/` is identical.
 - Remotes:
   - `upstream`: `dmmulroy/anti-slop`.
   - `origin`: `windfall-digital/antislop`. This repo **does not exist on GitHub yet**; create it as a public fork (`gh repo fork dmmulroy/anti-slop --org windfall-digital --fork-name antislop`), then push.
-- `windfall/` is a copy of the template's `tools/oxlint/windfall/`: 3 rules, their tests, and a shared helper. It isn't wired into `package.json`, the tests or CI yet.
-- Nothing has been installed (`pnpm install` hasn't run).
+- Packaging, tests, workflows and docs (TODO 1–6) are done locally. Nothing is pushed or tagged.
 
 ## Layout decision
 
@@ -30,27 +29,21 @@ Use a git tag, not npm, for now. The `windfall-digital` org doesn't exist on npm
 - A tag-triggered release workflow builds `dist/` and commits it only on the tag commit; `main` stays source-only.
 - Moving to npm later only changes the consumer's version string, plus adding a publish step here.
 
-## TODO
+## Decisions
 
-1. **Package**
-   - Rename to `@windfall-digital/antislop` and remove `private`.
-   - Add a `build` script (`tsc` with emit to `dist/`).
-   - Add the `exports` map, and keep `@oxlint/plugins` as a runtime dependency.
-   - Keep oxlint and `@oxlint/plugins` on one version. Upstream uses 1.78.0 and the template uses 1.87.0; decide whether to bump.
-2. **Tests:** add `tsx windfall/rules/*.test.ts` to the `test` script. Our tests already use upstream's module-level `RuleTester` style. Make sure `pnpm check` lints and typechecks `windfall/` too.
-3. **`windfall/index.ts`:** keep the plugin name `windfall`. The `no-interpolated-class-name` message names a consumer helper, `classNames()`; decide whether that wording stays (it's our fork).
-4. **Release workflow** (`.github/workflows/release.yml`):
-   - Triggers on a `v*` tag push.
-   - Runs install, check and build.
-   - Commits `dist/` to the tag (force-moving the tag) or to a `release` branch.
-   - Creates a GitHub Release.
-5. **Upstream sync workflow** (`.github/workflows/upstream-sync.yml`):
-   - Runs on a daily `schedule` and on `workflow_dispatch`.
-   - Fetches `upstream/main`. If it isn't an ancestor of `main`, it merges it on a `sync/upstream` branch and opens or updates a PR.
-   - On a merge conflict, it opens or updates an issue instead.
-   - It must not push to `main` directly.
-6. **Docs:** a short note in README.md about the fork and the windfall rules. Keep upstream's `LICENSE` and copyright, and add ours alongside it.
-7. **First release:** `v0.2.0`.
+- **oxlint 1.87.0.** `oxlint` and `@oxlint/plugins` are both pinned to 1.87.0, the template's version. Upstream's `src/` passes its tests on it. Expect `package.json`/`pnpm-lock.yaml` conflicts in upstream syncs whenever upstream bumps them.
+- **Build:** `pnpm build` runs `tsc -p tsconfig.build.json` (`rewriteRelativeImportExtensions`, tests excluded) into `dist/`, and copies the vendored eslint-stylistic `LICENSE`/`UPSTREAM.md` alongside. No `.d.ts`: consumers load the plugins by specifier from `jsPlugins`. `pnpm check` ends with `pnpm build`, so CI catches build breaks.
+- **Windfall tests run in `posttest`.** Upstream's single-line `test` script stays byte-identical so that upstream adding a rule test doesn't conflict. pnpm runs `posttest` after `test` by default.
+- **`no-interpolated-class-name`** keeps its `classNames()` wording; it's our fork.
+- **Release** (`.github/workflows/release.yml`): a `v*` tag push checks that the tag equals `v` + `package.json` `version`, runs `pnpm check` (which builds), commits `dist/` on top of the tagged commit, force-moves the tag to that commit, and creates a GitHub Release. Re-runs skip the build if the tag already carries `dist/`. Tag rulesets that block force-pushes would break it.
+- **Upstream sync** (`.github/workflows/upstream-sync.yml`): daily at 05:17 UTC and on `workflow_dispatch`. A clean merge force-pushes `sync/upstream` (rebuilt from `main` each run) and opens or updates a PR; a conflict opens, or comments on, an issue titled "Upstream sync: merge conflict with dmmulroy/anti-slop". It never pushes to `main`. Known `GITHUB_TOKEN` limits: the PR it opens doesn't trigger CI (close and reopen it, or switch to an App/PAT token), and the push fails if upstream changes `.github/workflows/` (merge that one by hand).
+
+## Release procedure
+
+1. Bump `version` in `package.json` on `main`.
+2. Tag `vX.Y.Z` on that commit and push the tag; the release workflow does the rest.
+
+First release: `v0.2.0` (`package.json` is already at 0.2.0). Tag only after owner approval.
 
 ## After the first release, in windfall-template
 

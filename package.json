@@ -1,27 +1,35 @@
 {
-  "name": "oxlint-plugin-anti-slop",
-  "version": "0.1.2",
-  "private": true,
+  "name": "@windfall-digital/antislop",
+  "version": "0.2.0",
   "description": "Opinionated Oxlint rules that reject low-evidence TypeScript and JavaScript patterns.",
   "type": "module",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./windfall": "./dist/windfall/index.js"
+  },
   "files": [
-    "src"
+    "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windfall-digital/antislop.git"
+  },
   "scripts": {
-    "check": "pnpm lint && pnpm test && pnpm typecheck && pnpm check:skill-assets",
-    "lint": "oxlint src",
+    "check": "pnpm lint && pnpm test && pnpm typecheck && pnpm check:skill-assets && pnpm build",
+    "lint": "oxlint src windfall",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && cp src/vendor/eslint-stylistic/LICENSE src/vendor/eslint-stylistic/UPSTREAM.md dist/src/vendor/eslint-stylistic/",
     "test": "tsx src/rules/require-readable-spacing.test.ts && tsx src/rules/require-readable-spacing-cli.test.ts && tsx src/rules/no-array-filter-map.test.ts && tsx src/rules/no-reduce-accumulator-copy.test.ts && tsx src/rules/no-chained-type-assertions.test.ts && tsx src/rules/no-conditional-empty-object-spread.test.ts && tsx src/rules/no-unsafe-dictionary-type.test.ts && tsx src/rules/no-known-value-widening.test.ts && tsx src/rules/no-object-parameters.test.ts && tsx src/rules/no-unknown-parameters.test.ts && tsx src/rules/no-runtime-typeof.test.ts && tsx src/rules/no-shape-in-symbol-names.test.ts && tsx src/rules/no-unknown-returns.test.ts && tsx src/rules/no-unknown-type-aliases.test.ts && tsx src/rules/no-widen-then-assert.test.ts && tsx src/rules/no-reflect-get.test.ts && tsx src/rules/no-reflect-apply.test.ts && tsx src/rules/no-module-mocking.test.ts && tsx src/rules/require-safety-comment-for-type-assertion.test.ts && tsx src/effect/rules/no-service-constructor-imports.test.ts && tsx src/effect/rules/no-manual-tag-comparison.test.ts && tsx src/effect/rules/no-manual-effect-error-tag.test.ts && tsx src/effect/rules/no-manual-tagged-construction.test.ts && tsx src/effect/rules/prefer-effect-match.test.ts",
+    "posttest": "tsx windfall/rules/no-interpolated-class-name.test.ts && tsx windfall/rules/no-number-coercion-of-headers.test.ts && tsx windfall/rules/no-unparsed-json.test.ts",
     "typecheck": "tsc --noEmit",
     "sync:skill-assets": "node scripts/sync-skill-assets.mjs",
     "check:skill-assets": "node scripts/sync-skill-assets.mjs --check"
   },
   "dependencies": {
-    "@oxlint/plugins": "1.78.0"
+    "@oxlint/plugins": "1.87.0"
   },
   "devDependencies": {
     "@types/node": "26.2.0",
-    "oxlint": "1.78.0",
+    "oxlint": "1.87.0",
     "tsx": "4.23.12",
     "typescript": "7.0.2"
   },
