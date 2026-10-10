@@ -1,6 +1,6 @@
 # anti-slop
 
-> **Windfall fork.** This is `windfall-digital/antislop`, a fork of [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop). `src/` is upstream, unchanged, and is merged from `upstream/main` by a daily sync workflow. `windfall/` adds Windfall's own `windfall/*` rules (`no-interpolated-class-name`, `no-number-coercion-of-headers`, `no-unparsed-json`).
+> **Windfall fork.** This is `windfall-digital/antislop`, a fork of [dmmulroy/anti-slop](https://github.com/dmmulroy/anti-slop). `src/` is upstream, unchanged, and is merged from `upstream/main` by a daily sync workflow. `windfall/` adds Windfall's own `windfall/*` rules (`no-class-string-constant`, `no-interpolated-class-name`, `no-number-coercion-of-headers`, `no-unparsed-json`).
 >
 > The package `@windfall-digital/antislop` ships compiled JavaScript on release tags only, as Oxlint plugins: `anti-slop` (`@windfall-digital/antislop`), `windfall` (`@windfall-digital/antislop/windfall`) and the opt-in `anti-slop-effect` (`@windfall-digital/antislop/effect`). Install it from a tag, for example `"@windfall-digital/antislop": "github:windfall-digital/antislop#v0.3.0"`, and list the specifiers you need under `jsPlugins`. See [FORK.md](FORK.md). The rest of this README is upstream's.
 
